@@ -1,8 +1,8 @@
 const buildUrl = "Build";
 const config = {
-  dataUrl:            `${buildUrl}/WebGL.data`,
-  frameworkUrl:       `${buildUrl}/WebGL.framework.js`,
-  codeUrl:            `${buildUrl}/WebGL.wasm`,
+  dataUrl:            `${buildUrl}/Web.data.br`,
+  frameworkUrl:       `${buildUrl}/Web.framework.js.br`,
+  codeUrl:            `${buildUrl}/Web.wasm.br`,
   streamingAssetsUrl: "StreamingAssets",
   companyName:        "YourCompany",
   productName:        "Circulorb",
