@@ -14,3 +14,4 @@ v0.1.0 - Release
   - One guarenteed rainbow peg is given at the start of the game
   - Rainbow peg place more pegs upgrade can only give 1 or 2 pegs
 - Added some support for mobile
+- Actually updated the rainbow increase amount upgrade to what it says above.
