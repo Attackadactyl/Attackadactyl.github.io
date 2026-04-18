@@ -84,7 +84,8 @@
     document.addEventListener("gesturechange", e => e.preventDefault(), { passive: false });
     document.addEventListener("gestureend",    e => e.preventDefault(), { passive: false });
     document.body.addEventListener("touchmove", e => {
-      if (e.target.tagName !== "CANVAS") e.preventDefault();
+      const inChangelog = e.target.closest("#changelog-content");
+      if (!inChangelog && e.target.tagName !== "CANVAS") e.preventDefault();
     }, { passive: false });
 
     // Orientation handling

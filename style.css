@@ -226,10 +226,16 @@ header .description {
   border: 1px solid #444466;
   border-radius: 8px;
   width: min(600px, 100%);
-  max-height: 70vh;
+  height: 60vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+@media (pointer: coarse) {
+  #changelog-modal {
+    height: 80vh;
+  }
 }
 
 #changelog-header {
