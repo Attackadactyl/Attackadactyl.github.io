@@ -41,7 +41,19 @@
     <div id="unity-container">
       <canvas id="unity-canvas" tabindex="-1"></canvas>
     </div>
+    <button id="btn-changelog">Changelog</button>
   </main>
+
+  <!-- Changelog Modal -->
+  <div id="changelog-overlay">
+    <div id="changelog-modal">
+      <div id="changelog-header">
+        <span>Changelog</span>
+        <button id="changelog-close">&times;</button>
+      </div>
+      <pre id="changelog-content">Loading…</pre>
+    </div>
+  </div>
 
   <!-- Controls Bar -->
   <div id="controls-bar">
@@ -118,6 +130,25 @@
       if (window.unityInstance) {
         window.unityInstance.SendMessage("WebBridge", "SetMute", muted ? "true" : "false");
       }
+    });
+
+    // Changelog modal
+    const changelogOverlay = document.getElementById("changelog-overlay");
+    document.getElementById("btn-changelog").addEventListener("click", async () => {
+      changelogOverlay.classList.add("open");
+      const content = document.getElementById("changelog-content");
+      try {
+        const res = await fetch("changelog.txt?t=" + Date.now());
+        content.textContent = await res.text();
+      } catch {
+        content.textContent = "Could not load changelog.";
+      }
+    });
+    document.getElementById("changelog-close").addEventListener("click", () => {
+      changelogOverlay.classList.remove("open");
+    });
+    changelogOverlay.addEventListener("click", e => {
+      if (e.target === changelogOverlay) changelogOverlay.classList.remove("open");
     });
 
     // Canvas resize

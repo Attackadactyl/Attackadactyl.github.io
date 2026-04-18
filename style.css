@@ -189,6 +189,83 @@ header .description {
   line-height: 1.5;
 }
 
+/* Changelog button */
+#btn-changelog {
+  margin-top: 16px;
+  padding: 8px 24px;
+  background: transparent;
+  color: #a0a0b0;
+  border: 1px solid #444466;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+#btn-changelog:hover {
+  color: #e0e0e0;
+  border-color: #7864c6;
+}
+
+/* Changelog modal */
+#changelog-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  background: rgba(0, 0, 0, 0.7);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+#changelog-overlay.open {
+  display: flex;
+}
+
+#changelog-modal {
+  background: #14141f;
+  border: 1px solid #444466;
+  border-radius: 8px;
+  width: min(600px, 100%);
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#changelog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid #444466;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #8fd032;
+}
+
+#changelog-close {
+  background: none;
+  border: none;
+  color: #a0a0b0;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+#changelog-close:hover {
+  color: #e0e0e0;
+}
+
+#changelog-content {
+  padding: 16px 18px;
+  overflow-y: auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #c0c0d0;
+  white-space: pre-wrap;
+}
+
 /* Mobile landscape: compact layout so the game fits the screen */
 @media (pointer: coarse) and (orientation: landscape) {
   body {
