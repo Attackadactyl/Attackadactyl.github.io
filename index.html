@@ -2,12 +2,35 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Circulorb</title>
   <link rel="icon" type="image/png" href="Sprites/ball_icon.png" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
+  <!-- Loading Screen -->
+  <div id="loading-overlay">
+    <div class="loader-icon"></div>
+    <div class="loader-title">Circulorb</div>
+    <div class="loader-status" id="load-status">Initializing…</div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <!-- Rotate-to-Landscape Prompt -->
+  <div id="rotate-prompt">
+    <svg class="rotate-icon" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="14" y="6" width="44" height="60" rx="6" stroke="currentColor" stroke-width="2.5"/>
+      <path d="M58 36 l8 -6 l0 12Z" fill="#8fd032"/>
+      <circle cx="36" cy="58" r="3" fill="#a0a0b0"/>
+    </svg>
+    <div class="rotate-text">For the best experience, rotate your device to landscape.</div>
+  </div>
 
   <header>
     <h1>Circulorb</h1>
@@ -16,11 +39,156 @@
 
   <main>
     <div id="unity-container">
-      <canvas id="unity-canvas"></canvas>
+      <canvas id="unity-canvas" tabindex="-1"></canvas>
     </div>
   </main>
 
-  <script src="Build/Web.loader.js"></script>
-  <script src="script.js"></script>
+  <!-- Controls Bar -->
+  <div id="controls-bar">
+    <button class="ctrl-btn" id="btn-fullscreen">Fullscreen</button>
+    <button class="ctrl-btn hidden-on-desktop" id="btn-mute">Mute</button>
+  </div>
+
+  <script>
+    const CONFIG = {
+      loaderUrl:          "Build/Web.loader.js",
+      dataUrl:            "Build/Web.data",
+      frameworkUrl:       "Build/Web.framework.js",
+      codeUrl:            "Build/Web.wasm",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName:        "YourCompany",
+      productName:        "Circulorb",
+      requireLandscape:   true,
+      mobilePixelRatio:   1,
+      desktopPixelRatio:  null,
+    };
+
+    const isMobile = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent)
+                  || (navigator.maxTouchPoints > 1);
+
+    // Prevent default touch behaviors
+    document.addEventListener("gesturestart",  e => e.preventDefault(), { passive: false });
+    document.addEventListener("gesturechange", e => e.preventDefault(), { passive: false });
+    document.addEventListener("gestureend",    e => e.preventDefault(), { passive: false });
+    document.body.addEventListener("touchmove", e => {
+      if (e.target.tagName !== "CANVAS") e.preventDefault();
+    }, { passive: false });
+
+    // Orientation handling
+    function checkOrientation() {
+      const prompt = document.getElementById("rotate-prompt");
+      if (!CONFIG.requireLandscape || !isMobile) {
+        prompt.classList.remove("show");
+        return;
+      }
+      prompt.classList.toggle("show", window.innerHeight > window.innerWidth);
+    }
+    window.addEventListener("resize", checkOrientation);
+    window.addEventListener("orientationchange", () => setTimeout(checkOrientation, 200));
+    checkOrientation();
+
+    // Controls bar auto-show/hide
+    const controlsBar = document.getElementById("controls-bar");
+    let hideTimeout;
+    function showControls() {
+      controlsBar.classList.add("visible");
+      clearTimeout(hideTimeout);
+      hideTimeout = setTimeout(() => controlsBar.classList.remove("visible"), 3000);
+    }
+    document.addEventListener("mousemove", e => {
+      if (e.clientY > window.innerHeight - 60) showControls();
+    });
+    document.addEventListener("touchstart", showControls, { passive: true });
+
+    // Fullscreen
+    document.getElementById("btn-fullscreen").addEventListener("click", () => {
+      const el = document.documentElement;
+      if (!document.fullscreenElement) {
+        (el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen).call(el);
+      } else {
+        (document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen).call(document);
+      }
+    });
+
+    // Mute toggle
+    let muted = false;
+    document.getElementById("btn-mute").addEventListener("click", () => {
+      muted = !muted;
+      document.getElementById("btn-mute").textContent = muted ? "Unmute" : "Mute";
+      if (window.unityInstance) {
+        window.unityInstance.SendMessage("WebBridge", "SetMute", muted ? "true" : "false");
+      }
+    });
+
+    // Canvas resize
+    function resizeCanvas(canvas) {
+      const ratio = isMobile ? CONFIG.mobilePixelRatio : (CONFIG.desktopPixelRatio || window.devicePixelRatio);
+      canvas.width  = canvas.offsetWidth  * ratio;
+      canvas.height = canvas.offsetHeight * ratio;
+    }
+
+    // Load Unity
+    const loadScript = src => new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = () => reject(new Error("Failed to load " + src));
+      document.body.appendChild(s);
+    });
+
+    (async function boot() {
+      const overlay = document.getElementById("loading-overlay");
+      const status  = document.getElementById("load-status");
+      const fill    = document.getElementById("progress-fill");
+      const canvas  = document.getElementById("unity-canvas");
+
+      resizeCanvas(canvas);
+      window.addEventListener("resize", () => resizeCanvas(canvas));
+
+      status.textContent = "Downloading engine…";
+      try {
+        await loadScript(CONFIG.loaderUrl);
+      } catch (err) {
+        status.textContent = "Error: Could not load Unity loader.";
+        console.error(err);
+        return;
+      }
+
+      status.textContent = "Starting…";
+      window.unityInstance = await createUnityInstance(canvas, {
+        dataUrl:              CONFIG.dataUrl,
+        frameworkUrl:         CONFIG.frameworkUrl,
+        codeUrl:              CONFIG.codeUrl,
+        streamingAssetsUrl:   CONFIG.streamingAssetsUrl,
+        companyName:          CONFIG.companyName,
+        productName:          CONFIG.productName,
+        devicePixelRatio:     isMobile ? CONFIG.mobilePixelRatio : (CONFIG.desktopPixelRatio || window.devicePixelRatio),
+        matchWebGLToCanvasSize: false,
+      }, progress => {
+        const pct = Math.round(progress * 100);
+        fill.style.width = pct + "%";
+        if      (pct < 30)  status.textContent = "Downloading assets…";
+        else if (pct < 70)  status.textContent = "Compiling shaders…";
+        else if (pct < 100) status.textContent = "Almost ready…";
+        else                status.textContent = "Done!";
+      }).catch(err => {
+        status.textContent = "Error: " + (err.message || err);
+        console.error(err);
+      });
+
+      if (window.unityInstance) {
+        setTimeout(() => overlay.classList.add("hidden"), 400);
+
+        // Resume AudioContext on first user gesture
+        const resumeAudio = () => {
+          const ctx = window.unityInstance.Module?.audioContext
+                   || window.unityInstance.Module?.UnityAudioContext;
+          if (ctx?.state === "suspended") ctx.resume();
+        };
+        document.addEventListener("click",      resumeAudio, { once: true });
+        document.addEventListener("touchstart", resumeAudio, { once: true });
+      }
+    })();
+  </script>
 </body>
 </html>
