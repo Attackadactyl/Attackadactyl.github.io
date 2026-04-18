@@ -291,6 +291,10 @@ header .description {
     max-width: 100%;
     aspect-ratio: 16 / 10;
   }
+
+  #btn-changelog {
+    display: none;
+  }
 }
 
 /* Mobile/desktop visibility helpers */

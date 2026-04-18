@@ -1,3 +1,9 @@
+
+v0.1.1 - Release
+------------------------
+- Changed post processing settings of build to hopefully allow android to play game on mobile version of webpage.
+
+
 v0.1.0 - Release
 ------------------------
 - First web release of Circulorb w/ changelog!
