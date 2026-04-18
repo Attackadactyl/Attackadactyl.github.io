@@ -1,0 +1,16 @@
+v0.1.0 - Release
+------------------------
+- First web release of Circulorb w/ changelog!
+- Added changelog
+- Fixed bugs reported by players.
+  - Sufficient score not getting to next round.
+  - Exact score in first round not moving to next round.
+- Balance Changes
+  - Only 3 pegs will be given in the placement phase after choosing a new type of peg
+  - Bonus value described below
+- Added bonus value
+  - Score calculation is now pegs x edges x bonus
+  - Rainbow pegs add points to bonus value instead of pegs value
+  - One guarenteed rainbow peg is given at the start of the game
+  - Rainbow peg place more pegs upgrade can only give 1 or 2 pegs
+- Added some support for mobile
