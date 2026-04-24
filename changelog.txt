@@ -1,4 +1,11 @@
 
+v0.1.2 - Updates to player bugs and custom ball
+------------------------
+- Added two new balls.
+- Changed leftovers relic to only give up to half of the next round goal score.
+- All balls should be deleted at the end of the round so that none are sticking around ontop of split pegs at the start of the next round.
+
+
 v0.1.1 - Release
 ------------------------
 - Changed post processing settings of build to hopefully allow android to play game on mobile version of webpage.
