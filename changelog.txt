@@ -1,4 +1,11 @@
 
+v0.1.5 - Added boss rounds
+------------------------
+- Total amount of rounds is 25
+- Every 5 rounds will be a boss round
+- There are different negative effects to the player during the boss rounds
+
+
 v0.1.4 - Updates to bugs
 ------------------------
 - Removed size up peg
