@@ -1,4 +1,12 @@
 
+v0.1.6 - Added ball abilities and peg animations
+------------------------
+- Added abilities to a handful of balls
+- The balls will earn experience based on rounds completed (win or lose)
+- When the ball ranks up it will increase the chance of it's ability happening
+- Added animations to pegs
+
+
 v0.1.5 - Added boss rounds
 ------------------------
 - Total amount of rounds is 25
